@@ -1,0 +1,1016 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intro to GenAI and Prompt Engineering</title>
+  <style>
+    :root {
+      --bg: #1a2238;
+      --panel: #202b47;
+      --panel-2: #1c2640;
+      --text: #edf3ff;
+      --muted: #b7c6e6;
+      --line: #3a4d79;
+      --accent: #5cc9ff;
+      --accent-2: #63e7b8;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(1200px 700px at 85% -10%, #2a3b67 0%, var(--bg) 56%);
+      color: var(--text);
+      font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+    }
+
+    .deck {
+      height: 100vh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+    }
+
+    .slide {
+      min-height: 100vh;
+      padding: 56px;
+      display: grid;
+      align-content: center;
+      gap: 20px;
+      scroll-snap-align: start;
+      border-bottom: 1px solid #2e3f66;
+    }
+
+    .kicker {
+      color: var(--accent);
+      font-size: 0.86rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    h1, h2 { margin: 0; line-height: 1.1; letter-spacing: -0.01em; }
+    h1 { font-size: clamp(2.2rem, 5vw, 4.4rem); max-width: 14ch; }
+    h2 { font-size: clamp(1.8rem, 3.8vw, 3rem); }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 76ch;
+      line-height: 1.6;
+      font-size: 1.04rem;
+    }
+
+    .title-card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: clamp(1.3rem, 2vw, 2rem);
+      max-width: 880px;
+    }
+
+    .byline {
+      font-size: clamp(1.1rem, 2vw, 1.6rem);
+      color: #dce9ff;
+      margin-top: 0.8rem;
+    }
+
+    .outline {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      counter-reset: item;
+      max-width: 980px;
+    }
+
+    .outline div {
+      counter-increment: item;
+      background: linear-gradient(180deg, #243152, #1f2a46);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #e3ecff;
+    }
+
+    .outline div::before {
+      content: counter(item, decimal-leading-zero) " ";
+      color: var(--accent-2);
+      margin-right: 8px;
+      font-weight: 700;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+      max-width: 1180px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, #243152, #1f2a46);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .insight-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .insight-item {
+      background: linear-gradient(180deg, #29375d, #23304f);
+      border: 1px solid #415a8e;
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #e3ecff;
+      line-height: 1.45;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      max-width: 1100px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      border: 1px solid #4569a8;
+      color: #d6e7ff;
+      background: #2a3d67;
+    }
+
+    .transition-box {
+      max-width: 980px;
+      border: 1px solid #46639c;
+      background: linear-gradient(180deg, #273760, #223154);
+      border-radius: 14px;
+      padding: 16px 18px;
+      color: #e5efff;
+      font-size: 1.15rem;
+      line-height: 1.5;
+    }
+
+    .code-block {
+      margin: 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #4867a2;
+      background: #172744;
+      color: #d8e6ff;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 1180px;
+    }
+
+    .mini-card {
+      background: linear-gradient(180deg, #29375d, #23304f);
+      border: 1px solid #415a8e;
+      border-radius: 10px;
+      padding: 12px;
+      color: #e3ecff;
+    }
+
+    .mini-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      color: #eff5ff;
+    }
+
+    .visual-pop {
+      animation: fadeUp 560ms ease both;
+    }
+
+    .visual-pop.delay-1 { animation-delay: 80ms; }
+    .visual-pop.delay-2 { animation-delay: 160ms; }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulseLine {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 1; }
+    }
+
+    .flow-line {
+      animation: pulseLine 2.6s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .visual-pop,
+      .visual-pop.delay-1,
+      .visual-pop.delay-2,
+      .flow-line {
+        animation: none !important;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .slide { padding: 30px 20px; }
+      .outline { grid-template-columns: 1fr; }
+      .content-grid { grid-template-columns: 1fr; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <section class="slide" aria-label="Lecture title slide">
+      <div class="kicker">GenAI and Prompt Engineering</div>
+      <div class="title-card">
+        <h1>Intro to GenAI and Prompt Engineering</h1>
+        <p class="byline">by: Mahmoud Elbasha</p>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Lecture outline slide">
+      <div class="kicker">Session Roadmap</div>
+      <h2>Lecture Outlines</h2>
+      <p>This is the sequence we will follow in this session. We will complete one section at a time.</p>
+      <div class="outline">
+        <div>Setting the Context: Why Generative AI Matters</div>
+        <div>From Artificial Intelligence to Generative AI</div>
+        <div>What is a Large Language Model (LLM)?</div>
+        <div>How LLMs Generate Responses</div>
+        <div>Structural Limitations of LLMs</div>
+        <div>Where LLMs Add Real Value for Developers</div>
+        <div>Prompt as an Engineering Artifact</div>
+        <div>Core Prompt Structure for Reliable Output</div>
+        <div>Control Techniques and Professional Prompting</div>
+        <div>Responsible and Secure AI Usage</div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Why generative AI matters content slide">
+      <div class="kicker">01 • Setting the Context</div>
+      <h2>Why Generative AI Matters Now</h2>
+      <p>
+        Software systems are becoming more interconnected, faster-moving, and harder to reason about end-to-end.
+        Generative AI adds a new computational layer that helps developers move from basic automation into AI-assisted thinking:
+        accelerating design, interpretation, and decision support in daily engineering work.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list" role="list" aria-label="Key context points">
+          <div class="insight-item" role="listitem"><strong>Increasing complexity in software systems</strong><br />Modern stacks span frontend, backend, cloud services, data tools, and security concerns at once.</div>
+          <div class="insight-item" role="listitem"><strong>Growing cognitive load on developers</strong><br />Engineers now juggle architecture, debugging, integration, and communication in parallel.</div>
+          <div class="insight-item" role="listitem"><strong>From automation to AI-assisted thinking</strong><br />The shift is not only faster tasks; it is better support for analysis, exploration, and reasoning.</div>
+          <div class="insight-item" role="listitem"><strong>Generative AI as a computational layer</strong><br />AI becomes a collaborator layer above code, helping transform intent into structured outputs.</div>
+        </div>
+        <div class="panel visual-pop" aria-label="Progression visual">
+          <svg width="100%" viewBox="0 0 520 340" role="img" aria-label="Complexity to AI-assisted thinking flow">
+            <defs>
+              <linearGradient id="nodeA" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#1b2d61" />
+                <stop offset="100%" stop-color="#163f56" />
+              </linearGradient>
+            </defs>
+            <rect x="28" y="34" width="204" height="62" rx="12" fill="url(#nodeA)" stroke="#3e68c4" />
+            <text x="130" y="70" text-anchor="middle" fill="#eaf1ff" font-size="13">System Complexity Increases</text>
+
+            <rect x="288" y="34" width="204" height="62" rx="12" fill="url(#nodeA)" stroke="#3e68c4" />
+            <text x="390" y="70" text-anchor="middle" fill="#eaf1ff" font-size="13">Cognitive Load Rises</text>
+
+            <rect x="28" y="136" width="204" height="62" rx="12" fill="url(#nodeA)" stroke="#35a1c8" />
+            <text x="130" y="172" text-anchor="middle" fill="#eaf1ff" font-size="13">Automation Hits Limits</text>
+
+            <rect x="288" y="136" width="204" height="62" rx="12" fill="url(#nodeA)" stroke="#35a1c8" />
+            <text x="390" y="172" text-anchor="middle" fill="#eaf1ff" font-size="13">AI-Assisted Thinking</text>
+
+            <rect x="156" y="238" width="204" height="70" rx="12" fill="#113a3a" stroke="#56d8b0" />
+            <text x="258" y="269" text-anchor="middle" fill="#eaf1ff" font-size="13">Generative AI Layer</text>
+            <text x="258" y="288" text-anchor="middle" fill="#9dd9c7" font-size="12">Intent -> Prompt -> Guided Output</text>
+
+            <path class="flow-line" d="M232 65 L288 65 M130 96 L130 136 M390 96 L390 136 M232 167 L288 167 M130 198 L220 238 M390 198 L296 238" stroke="#54c7ff" stroke-width="2.5" fill="none" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="From AI to Generative AI slide one">
+      <div class="kicker">02 • From Artificial Intelligence to Generative AI</div>
+      <h2>The Evolution: AI -> ML -> DL -> Generative AI</h2>
+      <p>
+        These terms are connected, not separate worlds. Artificial Intelligence is the broad goal of intelligent behavior.
+        Machine Learning is one way to achieve that goal by learning from data. Deep Learning scales that learning with neural networks.
+        Generative AI is the next shift: models that create new content, not only classify existing inputs.
+      </p>
+      <div class="panel visual-pop" aria-label="Evolution visual timeline">
+        <svg width="100%" viewBox="0 0 980 280" role="img" aria-label="AI to Generative AI evolution">
+          <line x1="90" y1="138" x2="890" y2="138" stroke="#36508f" stroke-width="4" />
+
+          <circle cx="150" cy="138" r="14" fill="#6fa6ff" />
+          <text x="150" y="188" text-anchor="middle" fill="#eaf1ff" font-size="15">AI</text>
+          <text x="150" y="207" text-anchor="middle" fill="#9fc2ff" font-size="12">Intelligent behavior</text>
+
+          <circle cx="360" cy="138" r="14" fill="#56b8ff" />
+          <text x="360" y="188" text-anchor="middle" fill="#eaf1ff" font-size="15">ML</text>
+          <text x="360" y="207" text-anchor="middle" fill="#9fc2ff" font-size="12">Learns patterns from data</text>
+
+          <circle cx="570" cy="138" r="14" fill="#53d0de" />
+          <text x="570" y="188" text-anchor="middle" fill="#eaf1ff" font-size="15">Deep Learning</text>
+          <text x="570" y="207" text-anchor="middle" fill="#9fc2ff" font-size="12">Neural networks at scale</text>
+
+          <circle cx="780" cy="138" r="14" fill="#7af0c5" />
+          <text x="780" y="188" text-anchor="middle" fill="#eaf1ff" font-size="15">Generative AI</text>
+          <text x="780" y="207" text-anchor="middle" fill="#9fc2ff" font-size="12">Creates new content</text>
+
+          <path class="flow-line" d="M164 138 L346 138 M374 138 L556 138 M584 138 L766 138" stroke="#4fd2ff" stroke-width="2.5" />
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="AI history timeline">
+      <div class="kicker">02 • AI History Timeline</div>
+      <h2>Condensed History of AI (Conceptual Timeline)</h2>
+      <p>
+        AI evolved in waves: symbolic systems, statistical learning, deep learning scale-up, and then generative foundation models.
+        This timeline explains why modern AI feels different: capability moved from narrow prediction toward flexible generation.
+      </p>
+      <div class="panel visual-pop" aria-label="Descriptive AI timeline chart">
+        <svg width="100%" viewBox="0 0 980 320" role="img" aria-label="Timeline history of AI">
+          <line x1="70" y1="170" x2="920" y2="170" stroke="#3e5b94" stroke-width="4" />
+
+          <circle cx="120" cy="170" r="10" fill="#78a7ff" />
+          <text x="120" y="205" text-anchor="middle" fill="#eaf2ff" font-size="13">1950s-80s</text>
+          <text x="120" y="224" text-anchor="middle" fill="#b7caed" font-size="12">Symbolic AI</text>
+
+          <circle cx="320" cy="170" r="10" fill="#64b8ff" />
+          <text x="320" y="205" text-anchor="middle" fill="#eaf2ff" font-size="13">1990s-2000s</text>
+          <text x="320" y="224" text-anchor="middle" fill="#b7caed" font-size="12">Statistical ML</text>
+
+          <circle cx="520" cy="170" r="10" fill="#58cddb" />
+          <text x="520" y="205" text-anchor="middle" fill="#eaf2ff" font-size="13">2010s</text>
+          <text x="520" y="224" text-anchor="middle" fill="#b7caed" font-size="12">Deep Learning</text>
+
+          <circle cx="720" cy="170" r="10" fill="#6fe2c0" />
+          <text x="720" y="205" text-anchor="middle" fill="#eaf2ff" font-size="13">2020-2022</text>
+          <text x="720" y="224" text-anchor="middle" fill="#b7caed" font-size="12">Foundation Models</text>
+
+          <circle cx="880" cy="170" r="10" fill="#80f3c9" />
+          <text x="880" y="205" text-anchor="middle" fill="#eaf2ff" font-size="13">2023+</text>
+          <text x="880" y="224" text-anchor="middle" fill="#b7caed" font-size="12">Generative AI in Products</text>
+
+          <path class="flow-line" d="M130 170 L310 170 M330 170 L510 170 M530 170 L710 170 M730 170 L870 170" stroke="#68d2ff" stroke-width="2.4" fill="none" />
+          <text x="70" y="86" fill="#c6dbff" font-size="13">Trend: rules -> learning -> representation scale -> content generation</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Generative vs discriminative models">
+      <div class="kicker">02 • Model Perspectives</div>
+      <h2>Generative vs Discriminative Models</h2>
+      <p>
+        Discriminative models answer “which class does this belong to?” Generative models answer “what can I create next?”
+        This difference changes how we use AI in software: from prediction-only systems to systems that can draft code, text, and structured outputs.
+      </p>
+      <div class="compare-grid">
+        <div class="panel">
+          <span class="tag">Discriminative</span>
+          <div class="insight-list">
+            <div class="insight-item"><strong>Primary Job:</strong> Classify or predict labels.</div>
+            <div class="insight-item"><strong>Typical Output:</strong> Category, score, or probability.</div>
+            <div class="insight-item"><strong>Example:</strong> “Spam or Not Spam”, “Fraud or Normal”.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <span class="tag">Generative</span>
+          <div class="insight-list">
+            <div class="insight-item"><strong>Primary Job:</strong> Produce new tokens/content.</div>
+            <div class="insight-item"><strong>Typical Output:</strong> Text, code, summaries, plans.</div>
+            <div class="insight-item"><strong>Example:</strong> “Write function”, “Draft email”, “Create JSON”.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Why generation changed landscape">
+      <div class="kicker">02 • Why This Shift Matters</div>
+      <h2>Why Generation Changed the Landscape</h2>
+      <p>
+        Once models could generate useful language and code, AI moved into daily developer workflow. Instead of only flagging or classifying,
+        systems can now assist with ideation, implementation drafts, explanation, and iterative refinement. This is why prompt quality became a core engineering skill.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list">
+          <div class="insight-item"><strong>Before:</strong> Automation focused on narrow, predefined tasks.</div>
+          <div class="insight-item"><strong>Now:</strong> Generation supports open-ended problem solving.</div>
+          <div class="insight-item"><strong>Result:</strong> Engineers spend more time validating and steering, less time starting from blank pages.</div>
+        </div>
+        <div class="panel visual-pop">
+          <svg width="100%" viewBox="0 0 520 300" role="img" aria-label="Landscape change visual">
+            <rect x="36" y="42" width="196" height="86" rx="12" fill="#16285a" stroke="#3a5fa8" />
+            <text x="134" y="78" text-anchor="middle" fill="#dce9ff" font-size="14">Old Pattern</text>
+            <text x="134" y="100" text-anchor="middle" fill="#a9c3f5" font-size="12">Predict / Classify</text>
+
+            <rect x="288" y="42" width="196" height="86" rx="12" fill="#13405a" stroke="#3fa4c0" />
+            <text x="386" y="78" text-anchor="middle" fill="#dce9ff" font-size="14">New Pattern</text>
+            <text x="386" y="100" text-anchor="middle" fill="#a6d8e6" font-size="12">Generate / Assist / Refine</text>
+
+            <rect x="146" y="184" width="228" height="84" rx="12" fill="#123e38" stroke="#58d2ad" />
+            <text x="260" y="218" text-anchor="middle" fill="#e4fff8" font-size="14">Engineer + AI Collaboration</text>
+            <text x="260" y="240" text-anchor="middle" fill="#9cd9c8" font-size="12">Prompt -> Output -> Verify -> Iterate</text>
+
+            <path class="flow-line" d="M232 86 L288 86 M134 128 L204 184 M386 128 L316 184" stroke="#55cbff" stroke-width="2.5" fill="none" />
+          </svg>
+        </div>
+      </div>
+      <div class="transition-box">
+        Logical transition: <strong>If models can generate, how do they actually do it?</strong>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="What is an LLM foundation">
+      <div class="kicker">03 • What is a Large Language Model (LLM)?</div>
+      <h2>LLM Basics: Large, Language, Model</h2>
+      <p>
+        A Large Language Model is trained on massive text data and operates over tokens, not human-level ideas.
+        It is a statistical model that predicts plausible continuations. This is why it can sound fluent while still being uncertain or wrong.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list visual-pop">
+          <div class="insight-item"><strong>Large:</strong> Trained on very large text datasets, enabling broad pattern coverage.</div>
+          <div class="insight-item"><strong>Language:</strong> Works with token sequences (subwords, words, punctuation), not direct semantic truth.</div>
+          <div class="insight-item"><strong>Model:</strong> A probabilistic statistical system that estimates what token is likely next.</div>
+        </div>
+        <div class="panel visual-pop delay-1" aria-label="LLM concept visual">
+          <svg width="100%" viewBox="0 0 520 320" role="img" aria-label="LLM conceptual decomposition">
+            <rect x="132" y="24" width="256" height="68" rx="12" fill="#173665" stroke="#4f7ccc" />
+            <text x="260" y="64" text-anchor="middle" fill="#eff6ff" font-size="16">Large Language Model</text>
+
+            <rect x="32" y="146" width="140" height="90" rx="12" fill="#1c3d62" stroke="#4a94c2" />
+            <text x="102" y="178" text-anchor="middle" fill="#eaf3ff" font-size="14">Large</text>
+            <text x="102" y="199" text-anchor="middle" fill="#b7d4ef" font-size="12">Massive data</text>
+
+            <rect x="190" y="146" width="140" height="90" rx="12" fill="#1c3d62" stroke="#4a94c2" />
+            <text x="260" y="178" text-anchor="middle" fill="#eaf3ff" font-size="14">Language</text>
+            <text x="260" y="199" text-anchor="middle" fill="#b7d4ef" font-size="12">Token sequences</text>
+
+            <rect x="348" y="146" width="140" height="90" rx="12" fill="#1c3d62" stroke="#4a94c2" />
+            <text x="418" y="178" text-anchor="middle" fill="#eaf3ff" font-size="14">Model</text>
+            <text x="418" y="199" text-anchor="middle" fill="#b7d4ef" font-size="12">Probability engine</text>
+
+            <path class="flow-line" d="M260 92 L102 146 M260 92 L260 146 M260 92 L418 146" stroke="#63d2ff" stroke-width="2.3" fill="none" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="LLM core mechanism slide">
+      <div class="kicker">03 • Core Mechanism</div>
+      <h2>How an LLM Actually Produces Responses</h2>
+      <p>
+        At runtime, the model tokenizes input, reads available context inside a fixed window, predicts the next token, appends it,
+        and repeats. This loop is why an LLM behaves like a probabilistic language engine rather than a fact database.
+      </p>
+      <div class="content-grid">
+        <div class="panel visual-pop" aria-label="Prediction loop visual">
+          <svg width="100%" viewBox="0 0 560 340" role="img" aria-label="Tokenization context prediction loop">
+            <rect x="32" y="34" width="224" height="64" rx="11" fill="#1a3c61" stroke="#4e8ec1" />
+            <text x="144" y="72" text-anchor="middle" fill="#ecf5ff" font-size="14">Tokenization</text>
+
+            <rect x="304" y="34" width="224" height="64" rx="11" fill="#1a3c61" stroke="#4e8ec1" />
+            <text x="416" y="72" text-anchor="middle" fill="#ecf5ff" font-size="14">Context Window</text>
+
+            <rect x="32" y="150" width="224" height="64" rx="11" fill="#17465c" stroke="#47a6c2" />
+            <text x="144" y="188" text-anchor="middle" fill="#e8f8ff" font-size="14">Next-Token Prediction</text>
+
+            <rect x="304" y="150" width="224" height="64" rx="11" fill="#17465c" stroke="#47a6c2" />
+            <text x="416" y="188" text-anchor="middle" fill="#e8f8ff" font-size="14">Append + Repeat Loop</text>
+
+            <rect x="168" y="262" width="224" height="52" rx="11" fill="#11433d" stroke="#57d3a8" />
+            <text x="280" y="294" text-anchor="middle" fill="#e9fff8" font-size="14">Generated Response</text>
+
+            <path class="flow-line" d="M256 66 L304 66 M416 98 L416 150 M304 182 L256 182 M144 214 L224 262 M416 214 L336 262" stroke="#5fd3ff" stroke-width="2.4" fill="none" />
+          </svg>
+        </div>
+        <div class="panel insight-list visual-pop delay-1">
+          <div class="insight-item"><strong>Mental model:</strong> LLM = probabilistic language engine.</div>
+          <div class="insight-item"><strong>Not a database:</strong> It does not retrieve guaranteed facts by default.</div>
+          <div class="insight-item"><strong>Not conscious:</strong> It has no awareness or intent.</div>
+          <div class="insight-item"><strong>Not inherently truthful:</strong> Fluency is not evidence of correctness.</div>
+        </div>
+      </div>
+      <div class="transition-box">
+        Why responses feel intelligent: the model is very good at predicting plausible language in context.
+        <br />
+        Transition: <strong>If it's probabilistic, then it has limitations.</strong>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Probability and generation behavior">
+      <div class="kicker">04 • How LLMs Generate Responses</div>
+      <h2>Probability Distribution Over Vocabulary</h2>
+      <p>
+        For each step in generation, the model assigns probabilities across many possible next tokens.
+        The chosen token comes from that distribution, then the loop repeats. This is the core reason outputs can differ
+        while still being coherent.
+      </p>
+      <div class="content-grid">
+        <div class="panel visual-pop" aria-label="Probability distribution visual">
+          <svg width="100%" viewBox="0 0 560 330" role="img" aria-label="Next token probability distribution">
+            <rect x="38" y="38" width="484" height="66" rx="12" fill="#1d3b64" stroke="#4d7fce" />
+            <text x="280" y="78" text-anchor="middle" fill="#edf5ff" font-size="14">Context: "The function returns the ..."</text>
+
+            <rect x="70" y="146" width="96" height="130" rx="10" fill="#22557f" stroke="#58a7d6" />
+            <text x="118" y="292" text-anchor="middle" fill="#d8ebff" font-size="12">value</text>
+            <text x="118" y="312" text-anchor="middle" fill="#9bd0ff" font-size="11">0.42</text>
+
+            <rect x="188" y="176" width="96" height="100" rx="10" fill="#244b77" stroke="#4e93c6" />
+            <text x="236" y="292" text-anchor="middle" fill="#d8ebff" font-size="12">result</text>
+            <text x="236" y="312" text-anchor="middle" fill="#9bd0ff" font-size="11">0.28</text>
+
+            <rect x="306" y="196" width="96" height="80" rx="10" fill="#2b436f" stroke="#4b86bb" />
+            <text x="354" y="292" text-anchor="middle" fill="#d8ebff" font-size="12">output</text>
+            <text x="354" y="312" text-anchor="middle" fill="#9bd0ff" font-size="11">0.18</text>
+
+            <rect x="424" y="220" width="96" height="56" rx="10" fill="#303d66" stroke="#4f79ab" />
+            <text x="472" y="292" text-anchor="middle" fill="#d8ebff" font-size="12">data</text>
+            <text x="472" y="312" text-anchor="middle" fill="#9bd0ff" font-size="11">0.07</text>
+
+            <path class="flow-line" d="M280 104 L118 146 M280 104 L236 176 M280 104 L354 196 M280 104 L472 220" stroke="#65d4ff" stroke-width="2.2" fill="none" />
+          </svg>
+        </div>
+        <div class="panel insight-list visual-pop delay-1">
+          <div class="insight-item"><strong>Token choice is probabilistic:</strong> The model ranks possible next tokens.</div>
+          <div class="insight-item"><strong>Highest probability is not always selected:</strong> Depends on decoding strategy.</div>
+          <div class="insight-item"><strong>Variation is expected:</strong> Different sampling paths can still be valid.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Deterministic vs sampling and temperature">
+      <div class="kicker">04 • Decoding Behavior</div>
+      <h2>Deterministic vs Sampling-Based Outputs</h2>
+      <p>
+        Deterministic decoding tends to produce the same output for the same prompt. Sampling-based decoding introduces controlled randomness.
+        Temperature conceptually controls how conservative or creative token selection becomes, which explains output variability.
+      </p>
+      <div class="compare-grid">
+        <div class="panel visual-pop">
+          <span class="tag">Deterministic</span>
+          <div class="insight-list">
+            <div class="insight-item"><strong>Behavior:</strong> Chooses highest-probability path more consistently.</div>
+            <div class="insight-item"><strong>Outcome:</strong> More stable and repeatable outputs.</div>
+            <div class="insight-item"><strong>Use case:</strong> Formal templates, predictable formatting, strict tasks.</div>
+          </div>
+        </div>
+        <div class="panel visual-pop delay-1">
+          <span class="tag">Sampling-Based</span>
+          <div class="insight-list">
+            <div class="insight-item"><strong>Behavior:</strong> Samples from probable candidates.</div>
+            <div class="insight-item"><strong>Outcome:</strong> More diverse phrasing and ideas.</div>
+            <div class="insight-item"><strong>Use case:</strong> Brainstorming, creative drafting, alternative approaches.</div>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="panel visual-pop delay-1" aria-label="Temperature concept">
+          <svg width="100%" viewBox="0 0 560 180" role="img" aria-label="Temperature conceptual scale">
+            <rect x="44" y="72" width="472" height="30" rx="14" fill="#1b3358" stroke="#4a73b0" />
+            <rect x="44" y="72" width="160" height="30" rx="14" fill="#2b90d9" />
+            <rect x="204" y="72" width="164" height="30" fill="#2fa7be" />
+            <rect x="368" y="72" width="148" height="30" rx="14" fill="#52cfa0" />
+            <text x="44" y="56" fill="#cfe6ff" font-size="12">Lower temperature: safer, narrower choices</text>
+            <text x="370" y="56" fill="#c9f4df" font-size="12">Higher temperature: broader, riskier choices</text>
+            <text x="44" y="124" fill="#a9c4e9" font-size="12">Why outputs vary: sampling path + temperature + prompt ambiguity</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Structural limitations and risks">
+      <div class="kicker">05 • Structural Limitations of LLMs</div>
+      <h2>Where Reliability Breaks Down</h2>
+      <p>
+        Fluency can hide errors. When prompts are ambiguous or weak, probabilistic generation amplifies uncertainty.
+        Reliable use requires risk awareness before trust.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list visual-pop">
+          <div class="insight-item"><strong>Hallucination:</strong> Fluent text does not guarantee factual accuracy.</div>
+          <div class="insight-item"><strong>Overconfidence:</strong> The model may present uncertain claims with high certainty.</div>
+          <div class="insight-item"><strong>Ambiguity amplification:</strong> Vague input can produce confidently vague output.</div>
+          <div class="insight-item"><strong>Context loss:</strong> Important details may be dropped in long conversations.</div>
+          <div class="insight-item"><strong>Garbage-in amplification:</strong> Weak or wrong prompts produce weak or wrong outputs faster.</div>
+        </div>
+        <div class="panel visual-pop delay-1" aria-label="Reliability risk map">
+          <svg width="100%" viewBox="0 0 520 320" role="img" aria-label="Prompt quality to output reliability map">
+            <rect x="40" y="40" width="200" height="70" rx="12" fill="#1d3b64" stroke="#4d7fce" />
+            <text x="140" y="70" text-anchor="middle" fill="#ecf4ff" font-size="14">Prompt Quality</text>
+            <text x="140" y="90" text-anchor="middle" fill="#a9c7ef" font-size="12">clear vs ambiguous</text>
+
+            <rect x="280" y="40" width="200" height="70" rx="12" fill="#1f2f5a" stroke="#607ab5" />
+            <text x="380" y="70" text-anchor="middle" fill="#ecf4ff" font-size="14">Model Fluency</text>
+            <text x="380" y="90" text-anchor="middle" fill="#a9c7ef" font-size="12">always looks confident</text>
+
+            <rect x="40" y="210" width="200" height="70" rx="12" fill="#2f3a57" stroke="#8a6fa7" />
+            <text x="140" y="240" text-anchor="middle" fill="#efe5ff" font-size="14">Low Reliability</text>
+            <text x="140" y="260" text-anchor="middle" fill="#d6bfe9" font-size="12">hallucination risk</text>
+
+            <rect x="280" y="210" width="200" height="70" rx="12" fill="#17473e" stroke="#5bcc9f" />
+            <text x="380" y="240" text-anchor="middle" fill="#e7fff7" font-size="14">Higher Reliability</text>
+            <text x="380" y="260" text-anchor="middle" fill="#b8ebd8" font-size="12">with verification habits</text>
+
+            <path class="flow-line" d="M140 110 L140 210 M380 110 L380 210 M240 75 L280 75" stroke="#67d1ff" stroke-width="2.3" fill="none" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Professional reliability mindset">
+      <div class="kicker">05 • Professional Reliability Mindset</div>
+      <h2>Before Trusting an Output, Ask These Questions</h2>
+      <p>
+        Professional AI usage is less about getting an answer quickly and more about evaluating answer quality systematically.
+        Use this reliability checklist before accepting generated content in real work.
+      </p>
+      <div class="panel insight-list visual-pop">
+        <div class="insight-item"><strong>What assumptions is it making?</strong> Hidden assumptions often cause subtle failure.</div>
+        <div class="insight-item"><strong>What edge cases might break this?</strong> Test beyond normal examples.</div>
+        <div class="insight-item"><strong>What are the limitations?</strong> Ask the model to state uncertainty and scope.</div>
+        <div class="insight-item"><strong>How confident is the answer?</strong> Confidence language should be verified, not trusted.</div>
+      </div>
+      <div class="transition-box">
+        Logical transition: <strong>If input shapes probabilistic output, then input structure matters.</strong>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Where LLMs add value for developers">
+      <div class="kicker">06 • Where LLMs Add Real Value for Developers</div>
+      <h2>From Limitations to Practical Value</h2>
+      <p>
+        Now it makes sense to discuss value. Given what we know about probabilistic behavior and limitations,
+        LLMs are most useful as structured reasoning support for developers, especially in high-friction tasks that require analysis, synthesis, and clear communication.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list visual-pop">
+          <div class="insight-item"><strong>Refactoring legacy code:</strong> Suggest modernization paths and safer incremental cleanup.</div>
+          <div class="insight-item"><strong>Explaining unfamiliar codebases:</strong> Accelerate onboarding and reduce initial confusion.</div>
+          <div class="insight-item"><strong>Writing documentation:</strong> Produce draft docs, README sections, and function descriptions.</div>
+          <div class="insight-item"><strong>Generating test cases:</strong> Propose normal, edge, and failure scenarios quickly.</div>
+          <div class="insight-item"><strong>Structuring vague requirements:</strong> Turn loose ideas into actionable engineering steps.</div>
+          <div class="insight-item"><strong>Brainstorming architecture options:</strong> Compare alternatives with tradeoff-driven framing.</div>
+        </div>
+        <div class="panel visual-pop delay-1" aria-label="Reasoning assistance visual">
+          <svg width="100%" viewBox="0 0 560 340" role="img" aria-label="Reasoning assistance not blind execution">
+            <rect x="40" y="34" width="220" height="76" rx="12" fill="#1d3b64" stroke="#4d7fce" />
+            <text x="150" y="66" text-anchor="middle" fill="#edf5ff" font-size="14">Developer Intent</text>
+            <text x="150" y="88" text-anchor="middle" fill="#b3d1f0" font-size="12">problem + constraints</text>
+
+            <rect x="300" y="34" width="220" height="76" rx="12" fill="#164a58" stroke="#47a7bb" />
+            <text x="410" y="66" text-anchor="middle" fill="#ecfbff" font-size="14">LLM Reasoning Support</text>
+            <text x="410" y="88" text-anchor="middle" fill="#b2e3ee" font-size="12">drafts + alternatives + checks</text>
+
+            <rect x="170" y="154" width="220" height="76" rx="12" fill="#17473e" stroke="#5bcc9f" />
+            <text x="280" y="186" text-anchor="middle" fill="#eafff7" font-size="14">Engineer Validation</text>
+            <text x="280" y="208" text-anchor="middle" fill="#b6ebd9" font-size="12">decide, verify, finalize</text>
+
+            <rect x="145" y="258" width="270" height="56" rx="12" fill="#2f3452" stroke="#7e88ba" />
+            <text x="280" y="292" text-anchor="middle" fill="#eef1ff" font-size="14">Not blind execution -> guided execution</text>
+
+            <path class="flow-line" d="M260 72 L300 72 M410 110 L320 154 M150 110 L240 154 M280 230 L280 258" stroke="#63d4ff" stroke-width="2.3" fill="none" />
+          </svg>
+        </div>
+      </div>
+      <div class="transition-box">
+        Important distinction: <strong>Use LLMs for reasoning assistance, not blind execution.</strong>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="AI usage charts in developer workflow">
+      <div class="kicker">06 • Usage Patterns</div>
+      <h2>How AI Is Commonly Used in Developer Workflows</h2>
+      <p>
+        Usage tends to concentrate on support-heavy engineering tasks. The highest value appears in drafting, explanation, testing, and refactoring workflows.
+        These charts are for classroom illustration of practical usage patterns, not official benchmarks.
+      </p>
+      <div class="content-grid">
+        <div class="panel visual-pop" aria-label="Use case distribution chart">
+          <svg width="100%" viewBox="0 0 560 320" role="img" aria-label="AI usage distribution by task">
+            <text x="28" y="32" fill="#d9e8ff" font-size="14">Illustrative use-case distribution</text>
+            <rect x="28" y="54" width="180" height="22" rx="6" fill="#5bc7ff" />
+            <text x="220" y="70" fill="#dceaff" font-size="12">Code explanation / onboarding</text>
+
+            <rect x="28" y="92" width="160" height="22" rx="6" fill="#56bbf0" />
+            <text x="200" y="108" fill="#dceaff" font-size="12">Documentation drafting</text>
+
+            <rect x="28" y="130" width="210" height="22" rx="6" fill="#61d3d4" />
+            <text x="250" y="146" fill="#dceaff" font-size="12">Refactoring suggestions</text>
+
+            <rect x="28" y="168" width="170" height="22" rx="6" fill="#64d9bf" />
+            <text x="210" y="184" fill="#dceaff" font-size="12">Test case generation</text>
+
+            <rect x="28" y="206" width="145" height="22" rx="6" fill="#7cdca8" />
+            <text x="185" y="222" fill="#dceaff" font-size="12">Requirement structuring</text>
+
+            <rect x="28" y="244" width="132" height="22" rx="6" fill="#8ee49d" />
+            <text x="172" y="260" fill="#dceaff" font-size="12">Architecture brainstorming</text>
+          </svg>
+        </div>
+        <div class="panel visual-pop delay-1" aria-label="Adoption curve chart">
+          <svg width="100%" viewBox="0 0 560 320" role="img" aria-label="Illustrative AI adoption trend">
+            <text x="28" y="32" fill="#d9e8ff" font-size="14">Illustrative adoption trend in teams</text>
+            <line x1="44" y1="250" x2="520" y2="250" stroke="#4d6fa8" stroke-width="2" />
+            <line x1="44" y1="70" x2="44" y2="250" stroke="#4d6fa8" stroke-width="2" />
+            <path class="flow-line" d="M44 230 C130 220, 170 195, 230 170 C300 140, 360 120, 420 95 C460 80, 490 64, 520 54" fill="none" stroke="#66d6ff" stroke-width="3" />
+            <circle cx="44" cy="230" r="4" fill="#9de8ff" />
+            <circle cx="230" cy="170" r="4" fill="#9de8ff" />
+            <circle cx="420" cy="95" r="4" fill="#9de8ff" />
+            <circle cx="520" cy="54" r="4" fill="#9de8ff" />
+            <text x="54" y="272" fill="#b9cfef" font-size="11">Early adoption</text>
+            <text x="236" y="272" fill="#b9cfef" font-size="11">Workflow integration</text>
+            <text x="420" y="272" fill="#b9cfef" font-size="11">Daily engineering use</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Prompt as engineering artifact">
+      <div class="kicker">07 • Prompt as an Engineering Artifact</div>
+      <h2>Prompt Is a Specification Layer</h2>
+      <p>
+        Prompt does not mean asking a casual question. In professional workflows, prompt design is specification design:
+        it constrains behavior, defines expected output, and acts as an interface between developer intent and model generation.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list visual-pop">
+          <div class="insight-item"><strong>Prompt != question:</strong> A good prompt defines scope and criteria.</div>
+          <div class="insight-item"><strong>Prompt = specification:</strong> It states what to do, what to avoid, and how to respond.</div>
+          <div class="insight-item"><strong>Behavioral constraint:</strong> Role, limits, and output format shape model behavior.</div>
+          <div class="insight-item"><strong>Interface layer:</strong> Prompt translates human goals into machine instructions.</div>
+          <div class="insight-item"><strong>Soft programming:</strong> You control behavior through structured language.</div>
+        </div>
+        <div class="panel visual-pop delay-1" aria-label="Prompt specification analogy">
+          <svg width="100%" viewBox="0 0 560 340" role="img" aria-label="Requirement quality analogy">
+            <rect x="36" y="36" width="220" height="110" rx="12" fill="#2f3452" stroke="#7e88ba" />
+            <text x="146" y="70" text-anchor="middle" fill="#eef1ff" font-size="14">Bad Requirement Doc</text>
+            <text x="146" y="92" text-anchor="middle" fill="#cdd4f5" font-size="12">Ambiguous goals</text>
+            <text x="146" y="112" text-anchor="middle" fill="#cdd4f5" font-size="12">Missing constraints</text>
+
+            <rect x="304" y="36" width="220" height="110" rx="12" fill="#1f2f5a" stroke="#607ab5" />
+            <text x="414" y="70" text-anchor="middle" fill="#eef1ff" font-size="14">Bad Prompt</text>
+            <text x="414" y="92" text-anchor="middle" fill="#bdd0f0" font-size="12">Vague instructions</text>
+            <text x="414" y="112" text-anchor="middle" fill="#bdd0f0" font-size="12">No output contract</text>
+
+            <rect x="36" y="196" width="220" height="110" rx="12" fill="#4a2d48" stroke="#a66ea2" />
+            <text x="146" y="230" text-anchor="middle" fill="#ffe8ff" font-size="14">Unreliable Software</text>
+            <text x="146" y="252" text-anchor="middle" fill="#efc8ef" font-size="12">Unexpected behavior</text>
+
+            <rect x="304" y="196" width="220" height="110" rx="12" fill="#4b2f3f" stroke="#ba7a8b" />
+            <text x="414" y="230" text-anchor="middle" fill="#ffecef" font-size="14">Unreliable Output</text>
+            <text x="414" y="252" text-anchor="middle" fill="#f0ccd3" font-size="12">Inconsistent quality</text>
+
+            <path class="flow-line" d="M146 146 L146 196 M414 146 L414 196 M256 91 L304 91" stroke="#76d5ff" stroke-width="2.3" fill="none" />
+          </svg>
+        </div>
+      </div>
+      <div class="transition-box">
+        Analogy: <strong>Bad requirement document -> unreliable software. Bad prompt -> unreliable output.</strong>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Essential AI terms for prompting">
+      <div class="kicker">07 • Essential Terms</div>
+      <h2>Operational AI Vocabulary for Prompt Engineering</h2>
+      <p>
+        The most useful place to introduce core terms is right after prompt-as-specification. These terms define the interface you use when shaping model behavior.
+      </p>
+      <div class="tech-grid">
+        <div class="mini-card visual-pop">
+          <h3>Prompt</h3>
+          <p>Instruction input defining role, task, context, constraints, and output expectations.</p>
+        </div>
+        <div class="mini-card visual-pop delay-1">
+          <h3>Completion</h3>
+          <p>The model's generated continuation/answer for a prompt.</p>
+        </div>
+        <div class="mini-card visual-pop">
+          <h3>Tokens</h3>
+          <p>Text units (subwords/symbols) the model processes and generates.</p>
+        </div>
+        <div class="mini-card visual-pop delay-1">
+          <h3>Context Window</h3>
+          <p>The amount of prompt/history the model can actively use when generating.</p>
+        </div>
+        <div class="mini-card visual-pop">
+          <h3>Temperature</h3>
+          <p>Controls output variability from conservative to more diverse sampling.</p>
+        </div>
+        <div class="mini-card visual-pop delay-1">
+          <h3>System vs User Instructions</h3>
+          <p>Higher-level behavior rules versus task-specific requests in a conversation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Core prompt structure for reliable output">
+      <div class="kicker">08 • Core Prompt Structure for Reliable Output</div>
+      <h2>Engineer-Level Prompt Structure</h2>
+      <p>
+        For serious engineering tasks, prompts should be written like lightweight specifications.
+        This reduces ambiguity, improves consistency, and makes outputs easier to validate and reuse.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list visual-pop">
+          <div class="insight-item"><strong>Clear objective:</strong> Exactly what should be produced.</div>
+          <div class="insight-item"><strong>Context:</strong> Relevant project setup and constraints.</div>
+          <div class="insight-item"><strong>Explicit constraints:</strong> What to avoid and what to enforce.</div>
+          <div class="insight-item"><strong>Output contract:</strong> Required format/schema.</div>
+          <div class="insight-item"><strong>Optional verification step:</strong> Ask for assumptions, edge cases, and checks.</div>
+        </div>
+        <div class="panel visual-pop delay-1">
+          <p style="margin-bottom:10px;">Example progression (HTML/CSS/JS):</p>
+          <pre class="code-block">Vague:
+"make this landing page better"
+
+Structured:
+"Improve this landing page (HTML/CSS/JS).
+Goal: better readability and spacing.
+Constraints: no framework, keep same sections.
+Output: updated HTML + CSS only."
+
+Production-grade:
+"You are a frontend reviewer.
+Task: optimize this landing page (HTML/CSS/JS) for readability and mobile.
+Context: beginner MEARN students, no frameworks.
+Constraints: keep semantic HTML, no external libraries, max 2 color accents.
+Output contract: 1) updated HTML 2) updated CSS 3) change log table.
+Verification: list 3 accessibility checks and 3 edge-case viewport tests."</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Debugging-focused prompting">
+      <div class="kicker">08 • Prompt Structure in Debugging</div>
+      <h2>Debugging-Focused Prompting Template</h2>
+      <p>
+        Debug prompts should include concrete runtime signals. Provide the actual error, environment details, expected behavior,
+        and ask for root cause plus alternatives. This leads to actionable fixes instead of generic advice.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list visual-pop">
+          <div class="insight-item"><strong>Include error message:</strong> Exact text from console/browser.</div>
+          <div class="insight-item"><strong>Include environment:</strong> Browser, OS, and project setup.</div>
+          <div class="insight-item"><strong>State expected behavior:</strong> What should happen.</div>
+          <div class="insight-item"><strong>Ask for root cause:</strong> Why this specific issue appears.</div>
+          <div class="insight-item"><strong>Ask for alternatives:</strong> Safer fix + quick workaround.</div>
+        </div>
+        <div class="panel visual-pop delay-1">
+          <pre class="code-block">"Debug this JavaScript issue.
+Error: Uncaught TypeError: Cannot read properties of null (reading 'addEventListener')
+Environment: Chrome 122, Windows 11, plain HTML/CSS/JS, script in head.
+Expected behavior: button click should toggle the sidebar.
+Task:
+1) Identify root cause.
+2) Provide 2 alternative fixes.
+3) Explain tradeoff of each.
+4) Return corrected HTML + JS snippet."</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Control techniques and professional prompting">
+      <div class="kicker">09 • Control Techniques and Professional Prompting</div>
+      <h2>Technique Toolkit (HTML/CSS/JS Examples)</h2>
+      <p>
+        These techniques increase control and reliability. In professional use, combine them instead of relying on a single style.
+      </p>
+      <div class="tech-grid">
+        <div class="mini-card visual-pop">
+          <h3>Zero-shot prompting</h3>
+          <pre class="code-block">"Create a vanilla JS function that validates email format and show usage examples."</pre>
+        </div>
+        <div class="mini-card visual-pop delay-1">
+          <h3>Few-shot prompting</h3>
+          <pre class="code-block">"Classify UI bugs as [HTML/CSS/JS].
+Example: 'margin collapse issue' -> CSS
+Example: 'missing closing tag' -> HTML
+Now classify: 'button click handler not firing'."</pre>
+        </div>
+        <div class="mini-card visual-pop">
+          <h3>Role prompting</h3>
+          <pre class="code-block">"You are a senior frontend mentor.
+Review this HTML/CSS navbar code and give 3 improvements for maintainability."</pre>
+        </div>
+        <div class="mini-card visual-pop delay-1">
+          <h3>Structured output (JSON/table)</h3>
+          <pre class="code-block">"Return valid JSON only:
+{ 'issues': [{ 'type':'HTML|CSS|JS', 'severity':'low|med|high', 'fix':'...' }] }"</pre>
+        </div>
+        <div class="mini-card visual-pop">
+          <h3>Ask for assumptions</h3>
+          <pre class="code-block">"Before answering, list assumptions about browser support and screen sizes."</pre>
+        </div>
+        <div class="mini-card visual-pop delay-1">
+          <h3>Ask for confidence</h3>
+          <pre class="code-block">"After your fix, provide confidence (high/medium/low) and what should be verified manually."</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Iterative refinement and professional habit">
+      <div class="kicker">09 • Iterative Refinement</div>
+      <h2>Professional Prompting Loop</h2>
+      <p>
+        Treat prompting as an iteration loop: draft prompt, inspect output quality, tighten constraints, and re-run.
+        This process is essential when outputs affect code quality, product behavior, or team decisions.
+      </p>
+      <div class="content-grid">
+        <div class="panel visual-pop" aria-label="Iterative loop visual">
+          <svg width="100%" viewBox="0 0 560 300" role="img" aria-label="Prompt iteration loop">
+            <rect x="50" y="44" width="200" height="62" rx="11" fill="#1d3b64" stroke="#4d7fce" />
+            <text x="150" y="80" text-anchor="middle" fill="#edf5ff" font-size="14">Draft Prompt</text>
+
+            <rect x="310" y="44" width="200" height="62" rx="11" fill="#1a465f" stroke="#4ea3c1" />
+            <text x="410" y="80" text-anchor="middle" fill="#edfbff" font-size="14">Inspect Output</text>
+
+            <rect x="50" y="184" width="200" height="62" rx="11" fill="#204a65" stroke="#5ca9ca" />
+            <text x="150" y="220" text-anchor="middle" fill="#edfbff" font-size="14">Tighten Structure</text>
+
+            <rect x="310" y="184" width="200" height="62" rx="11" fill="#17473e" stroke="#5bcc9f" />
+            <text x="410" y="220" text-anchor="middle" fill="#e9fff7" font-size="14">Re-run + Validate</text>
+
+            <path class="flow-line" d="M250 75 L310 75 M410 106 L410 184 M310 215 L250 215 M150 184 L150 106" stroke="#69d7ff" stroke-width="2.4" fill="none" />
+          </svg>
+        </div>
+        <div class="panel insight-list visual-pop delay-1">
+          <div class="insight-item"><strong>Iterative refinement:</strong> Improve prompt quality based on output gaps.</div>
+          <div class="insight-item"><strong>Serious work habit:</strong> enforce objective, constraints, and output format every time.</div>
+          <div class="insight-item"><strong>Professional standard:</strong> always request assumptions and confidence when accuracy matters.</div>
+        </div>
+      </div>
+      <div class="transition-box">
+        Professional habit: <strong>Always enforce structure in serious work.</strong>
+      </div>
+    </section>
+
+    <section class="slide" aria-label="Responsible and secure AI usage">
+      <div class="kicker">10 • Responsible and Secure AI Usage</div>
+      <h2>Security and Reliability Ground Rules</h2>
+      <p>
+        Production-minded AI usage requires clear safety boundaries. Treat model output as assistive, not authoritative,
+        and protect sensitive information at all times.
+      </p>
+      <div class="content-grid">
+        <div class="panel insight-list visual-pop">
+          <div class="insight-item"><strong>Never share confidential code:</strong> keep internal logic, proprietary algorithms, and sensitive business rules out of prompts.</div>
+          <div class="insight-item"><strong>Never share private keys:</strong> API keys, tokens, passwords, and secrets must never be pasted into chat tools.</div>
+          <div class="insight-item"><strong>Always verify logic:</strong> run tests, review edge cases, and validate behavior in your local environment.</div>
+          <div class="insight-item"><strong>Understand model boundaries:</strong> LLMs are probabilistic generators, not guaranteed truth systems.</div>
+          <div class="insight-item"><strong>Use AI as augmentation, not replacement:</strong> keep human engineering judgment as final decision-maker.</div>
+        </div>
+        <div class="panel visual-pop delay-1" aria-label="Responsible AI checklist visual">
+          <svg width="100%" viewBox="0 0 560 330" role="img" aria-label="Responsible AI checklist">
+            <rect x="42" y="34" width="476" height="262" rx="14" fill="#1b2c4f" stroke="#4b6ea8" />
+            <text x="74" y="72" fill="#eaf2ff" font-size="15">Responsible AI Checklist</text>
+
+            <rect x="74" y="92" width="18" height="18" rx="3" fill="#54d3a4" />
+            <text x="104" y="106" fill="#dce9ff" font-size="13">No confidential code</text>
+
+            <rect x="74" y="126" width="18" height="18" rx="3" fill="#54d3a4" />
+            <text x="104" y="140" fill="#dce9ff" font-size="13">No private keys or secrets</text>
+
+            <rect x="74" y="160" width="18" height="18" rx="3" fill="#54d3a4" />
+            <text x="104" y="174" fill="#dce9ff" font-size="13">Verify logic with tests</text>
+
+            <rect x="74" y="194" width="18" height="18" rx="3" fill="#54d3a4" />
+            <text x="104" y="208" fill="#dce9ff" font-size="13">Respect model limitations</text>
+
+            <rect x="74" y="228" width="18" height="18" rx="3" fill="#54d3a4" />
+            <text x="104" y="242" fill="#dce9ff" font-size="13">AI assists, engineer decides</text>
+
+            <path class="flow-line" d="M350 82 L474 82 M350 116 L474 116 M350 150 L474 150 M350 184 L474 184 M350 218 L474 218" stroke="#67d3ff" stroke-width="2" />
+          </svg>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
